@@ -1,6 +1,5 @@
 package service
 
-// Repo is fake database interface.
 type empSal struct {
 	basic int
 	HRA   int
@@ -33,9 +32,29 @@ func (g FetchSal) FetchSalComp() empSal {
 }
 
 func (g FetchSal) ProcessSalary() error {
-	empSal, _ := g.database.FetchEmployeeSalaryDetails("aa")
-	empDetails, _ := g.database.FetchEmployeeDetails("aa")
-	netSal := empSal.basic + empSal.HRA
+	empSal := getEmployeeDetails(g)
+	empDetails := getEmployeeSalaryDetails(g)
+	netSal := calculateSalary(empSal)
+	err := creditSalaryToBank(g, netSal, empDetails)
+	return err
+}
+
+func creditSalaryToBank(g FetchSal, netSal int, empDetails empDetails) error {
 	err := g.bankAPI.CreditSalaryToEmployee(netSal, empDetails.bankAccNumber)
 	return err
+}
+
+func calculateSalary(empSal empSal) int {
+	netSal := empSal.basic + empSal.HRA
+	return netSal
+}
+
+func getEmployeeSalaryDetails(g FetchSal) empDetails {
+	empDetails, _ := g.database.FetchEmployeeDetails("aa")
+	return empDetails
+}
+
+func getEmployeeDetails(g FetchSal) empSal {
+	empSal, _ := g.database.FetchEmployeeSalaryDetails("aa")
+	return empSal
 }
