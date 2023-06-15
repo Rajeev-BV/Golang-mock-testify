@@ -41,9 +41,10 @@ func TestMockMethodSalaryWithArgs2(t *testing.T) {
 
 	theDBRepoMock.On("FetchEmployeeSalaryDetails", "aa").Return(empSal, nil)
 	theDBRepoMock.On("FetchEmployeeDetails", "aa").Return(empDetails, nil)
+
 	theDBMockBankAPI.On("CreditSalaryToEmployee", 400, empDetails.bankAccNumber).Return(nil)
-	g := FetchSal{&theDBRepoMock, &theDBMockBankAPI}
 	//Act
+	g := FetchSal{&theDBRepoMock, &theDBMockBankAPI}
 	g.ProcessSalary()
 	//Assert
 	theDBMockBankAPI.AssertCalled(t, "CreditSalaryToEmployee", 400, empDetails.bankAccNumber)
